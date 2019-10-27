@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">KeiTracker</string>
+    <string name="start_tracking">Start Tracking Location</string>
+    <string name="stop_tracking">Stop Tracking Location</string>
+    <string name="location_text">"Latitude: %1$.4f\nLongitude: %2$.4f\nTimestamp: %3$tT"</string>
+    <string name="location_failed">Location is not available</string>
+</resources>
