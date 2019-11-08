@@ -15,16 +15,25 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.stetho.Stetho;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+
+import java.util.Date;
+import java.util.UUID;
+
+import ru.riselab.keitracker.db.AppDatabase;
+import ru.riselab.keitracker.db.dao.LocationDao;
+import ru.riselab.keitracker.db.model.LocationModel;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -35,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
     private TextView mLocationTextView;
 
     private boolean mTrackingLocation;
+    private String mTrackUuid;
+    private LocationDao mLocationDao;
     private Location mLastLocation;
     private LocationCallback mLocationCallback;
     private FusedLocationProviderClient mFusedLocationClient;
@@ -46,6 +57,9 @@ public class MainActivity extends AppCompatActivity {
 
         mLocationButton = findViewById(R.id.button_location);
         mLocationTextView = findViewById(R.id.textview_location);
+
+        AppDatabase db = AppDatabase.getDatabase(this);
+        mLocationDao = db.locationDao();
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -70,6 +84,9 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         };
+
+        // TODO: remove on release
+        Stetho.initializeWithDefaults(getApplicationContext());
     }
 
     @Override
@@ -114,11 +131,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void buttonLocationClick(View view) {
-        if (!mTrackingLocation) {
+        mTrackUuid = UUID.randomUUID().toString();
+        LocationModel currentLocation = new LocationModel(mTrackUuid,
+                10.5, 10.5, 2.0, new Date());
+        mLocationDao.insert(currentLocation);
+
+        /*if (!mTrackingLocation) {
             startTrackingLocation();
         } else {
             stopTrackingLocation();
-        }
+        }*/
     }
 
     private LocationRequest getLocationRequest() {
