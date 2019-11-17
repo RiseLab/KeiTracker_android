@@ -9,7 +9,7 @@ import androidx.room.RoomDatabase;
 import ru.riselab.keitracker.db.dao.LocationDao;
 import ru.riselab.keitracker.db.model.LocationModel;
 
-@Database(entities = {LocationModel.class}, version = 1)
+@Database(entities = {LocationModel.class}, version = 1, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     public abstract LocationDao locationDao();

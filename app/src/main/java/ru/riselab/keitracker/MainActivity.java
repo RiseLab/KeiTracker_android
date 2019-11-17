@@ -1,89 +1,60 @@
 package ru.riselab.keitracker;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 
 import android.Manifest;
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Location;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.stetho.Stetho;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.util.Date;
-import java.util.UUID;
+import java.util.List;
 
 import ru.riselab.keitracker.db.AppDatabase;
 import ru.riselab.keitracker.db.dao.LocationDao;
-import ru.riselab.keitracker.db.model.LocationModel;
+import ru.riselab.keitracker.db.pojo.Track;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final int REQUEST_PERMISSIONS = 1;
     private static final String TRACKING_LOCATION_KEY = "tracking_location";
 
-    private Button mLocationButton;
-    private TextView mLocationTextView;
+    private FloatingActionButton mFab;
 
     private boolean mTrackingLocation;
-    private String mTrackUuid;
+
     private LocationDao mLocationDao;
-    private Location mLastLocation;
-    private LocationCallback mLocationCallback;
-    private FusedLocationProviderClient mFusedLocationClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mLocationButton = findViewById(R.id.button_location);
-        mLocationTextView = findViewById(R.id.textview_location);
+        mFab = findViewById(R.id.fab);
 
         AppDatabase db = AppDatabase.getDatabase(this);
         mLocationDao = db.locationDao();
-
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-
-//        if (savedInstanceState != null) {
-//            mTrackingLocation = savedInstanceState.getBoolean(TRACKING_LOCATION_KEY);
-//        }
-
-        mLocationCallback = new LocationCallback() {
+        LiveData<List<Track>> tracksLiveData = mLocationDao.getTracks();
+        tracksLiveData.observe(this, new Observer<List<Track>>() {
             @Override
-            public void onLocationResult(LocationResult locationResult) {
-                super.onLocationResult(locationResult);
-
-                mLastLocation = locationResult.getLastLocation();
-                if (mTrackingLocation) {
-                    String locationText = getString(R.string.location_text,
-                            mLastLocation.getLatitude(),
-                            mLastLocation.getLongitude(),
-                            mLastLocation.getTime());
-
-                    mLocationTextView.setText(locationText);
-                    sendNotification(locationText);
-                }
+            public void onChanged(@Nullable List<Track> tracks) {
+                Log.d("keitest", "onChanged " + tracks);
             }
-        };
+        });
+
+        /*if (savedInstanceState != null) {
+            mTrackingLocation = savedInstanceState.getBoolean(TRACKING_LOCATION_KEY);
+        }*/
 
         // TODO: remove on release
         Stetho.initializeWithDefaults(getApplicationContext());
@@ -108,47 +79,34 @@ public class MainActivity extends AppCompatActivity {
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
-//        outState.putBoolean(TRACKING_LOCATION_KEY, mTrackingLocation);
+        /*outState.putBoolean(TRACKING_LOCATION_KEY, mTrackingLocation);*/
     }
 
     @Override
     protected void onPause() {
         super.onPause();
 
-//        if (mTrackingLocation) {
-//            stopTrackingLocation();
-//            mTrackingLocation = true;
-//        }
+        /*if (mTrackingLocation) {
+            stopTrackingLocation();
+            mTrackingLocation = true;
+        }*/
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-//        if (mTrackingLocation) {
-//            stopTrackingLocation();
-//        }
-    }
-
-    public void buttonLocationClick(View view) {
-        mTrackUuid = UUID.randomUUID().toString();
-        LocationModel currentLocation = new LocationModel(mTrackUuid,
-                10.5, 10.5, 2.0, new Date());
-        mLocationDao.insert(currentLocation);
-
-        /*if (!mTrackingLocation) {
-            startTrackingLocation();
-        } else {
+        /*if (mTrackingLocation) {
             stopTrackingLocation();
         }*/
     }
 
-    private LocationRequest getLocationRequest() {
-        LocationRequest locationRequest = new LocationRequest();
-        locationRequest.setInterval(10000);
-        locationRequest.setFastestInterval(5000);
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        return locationRequest;
+    public void buttonLocationClick(View view) {
+        if (!mTrackingLocation) {
+            startTrackingLocation();
+        } else {
+            stopTrackingLocation();
+        }
     }
 
     private void startTrackingLocation() {
@@ -159,8 +117,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             startForegroundService();
             mTrackingLocation = true;
-            mFusedLocationClient.requestLocationUpdates(getLocationRequest(), mLocationCallback, null);
-            mLocationButton.setText(R.string.stop_tracking);
+            mFab.setImageResource(R.drawable.ic_stop_tracking);
         }
     }
 
@@ -168,9 +125,7 @@ public class MainActivity extends AppCompatActivity {
         if (mTrackingLocation) {
             stopForegroundService();
             mTrackingLocation = false;
-            mFusedLocationClient.removeLocationUpdates(mLocationCallback);
-            mLocationButton.setText(R.string.start_tracking);
-            mLocationTextView.setText("");
+            mFab.setImageResource(R.drawable.ic_start_tracking);
         }
     }
 
@@ -183,22 +138,5 @@ public class MainActivity extends AppCompatActivity {
     private void stopForegroundService() {
         Intent serviceIntent = new Intent(this, ForegroundService.class);
         stopService(serviceIntent);
-    }
-
-    private void sendNotification(String text) {
-//        Intent notificationIntent = new Intent(this, MainActivity.class);
-//        PendingIntent pendingIntent = PendingIntent.getActivity(this,
-//                0, notificationIntent, 0);
-
-        Notification notification = new NotificationCompat.Builder(this,
-                ForegroundService.CHANNEL_ID)
-                .setContentTitle(getString(R.string.app_name))
-                .setContentText(text)
-                .setSmallIcon(R.drawable.ic_directions_walk_black_24dp)
-//                .setContentIntent(pendingIntent)
-                .setOnlyAlertOnce(true)
-                .build();
-        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        manager.notify(ForegroundService.SERVICE_ID, notification);
     }
 }
