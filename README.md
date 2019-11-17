@@ -8,5 +8,6 @@ Android tracking application
 - [ ] App state saving mechanism
 - [x] Save tracks to database
 - [ ] Implement ViewModel and RecyclerView to show tracks data
+- [ ] Create separate table for tracks, allow changing track name
 - [ ] Implement Google Maps and draw tracks
 - [ ] Improve UI (navigation, color scheme, etc.)

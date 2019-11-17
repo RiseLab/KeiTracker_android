@@ -1,0 +1,68 @@
+package ru.riselab.keitracker.adapters;
+
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.List;
+
+import ru.riselab.keitracker.R;
+import ru.riselab.keitracker.db.pojo.Track;
+
+public class TrackListAdapter extends RecyclerView.Adapter<TrackListAdapter.TrackViewHolder> {
+
+    class TrackViewHolder extends RecyclerView.ViewHolder {
+
+        private final TextView trackItemNameView;
+        private final TextView trackItemInfoView;
+
+        private TrackViewHolder(View itemView) {
+            super(itemView);
+            trackItemNameView = itemView.findViewById(R.id.trackItemName);
+            trackItemInfoView = itemView.findViewById(R.id.trackItemInfo);
+        }
+    }
+
+    private final LayoutInflater mInflater;
+    private List<Track> mTracks;
+
+    public TrackListAdapter(Context context) {
+        mInflater = LayoutInflater.from(context);
+    }
+
+    @NonNull
+    @Override
+    public TrackViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View itemView = mInflater.inflate(R.layout.track_item, parent, false);
+        return new TrackViewHolder(itemView);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull TrackViewHolder holder, int position) {
+        if (mTracks != null) {
+            Track current = mTracks.get(position);
+            holder.trackItemNameView.setText(current.trackUuid);
+            holder.trackItemInfoView.setText(String.format("From %s to %s", current.firstTime, current.lastTime));
+        } else {
+            // TODO: process data not ready case
+        }
+    }
+
+    public void setTracks(List<Track> tracks) {
+        mTracks = tracks;
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public int getItemCount() {
+        if (mTracks != null) {
+            return mTracks.size();
+        }
+        return 0;
+    }
+}

@@ -12,6 +12,7 @@ import android.os.IBinder;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -22,9 +23,9 @@ import com.google.android.gms.location.LocationServices;
 import java.util.Date;
 import java.util.UUID;
 
-import ru.riselab.keitracker.db.AppDatabase;
-import ru.riselab.keitracker.db.dao.LocationDao;
 import ru.riselab.keitracker.db.model.LocationModel;
+import ru.riselab.keitracker.db.repository.LocationRepository;
+import ru.riselab.keitracker.db.viewmodel.LocationViewModel;
 
 public class ForegroundService extends Service {
 
@@ -33,8 +34,7 @@ public class ForegroundService extends Service {
 
     private String mTrackUuid;
 
-    private LocationDao mLocationDao;
-
+    private LocationRepository mLocationRepository;
     private Location mLastLocation;
     private LocationCallback mLocationCallback;
     private FusedLocationProviderClient mFusedLocationClient;
@@ -45,8 +45,7 @@ public class ForegroundService extends Service {
 
         mTrackUuid = UUID.randomUUID().toString();
 
-        AppDatabase db = AppDatabase.getDatabase(this);
-        mLocationDao = db.locationDao();
+        mLocationRepository = new LocationRepository(getApplication());
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -62,7 +61,7 @@ public class ForegroundService extends Service {
                         mLastLocation.getLongitude(),
                         mLastLocation.getAltitude(),
                         new Date());
-                mLocationDao.insert(locationModel);
+                mLocationRepository.insert(locationModel);
 
                 String locationText = getString(R.string.location_text,
                         mLastLocation.getLatitude(),
