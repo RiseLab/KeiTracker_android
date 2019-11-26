@@ -19,11 +19,15 @@ public class LocationRepository {
     public LocationRepository(Application application) {
         AppDatabase db = AppDatabase.getDatabase(application);
         mLocationDao = db.locationDao();
-        mAllTracks = mLocationDao.getTracks();
+        mAllTracks = mLocationDao.getAllTracks();
     }
 
     public LiveData<List<Track>> getAllTracks() {
         return mAllTracks;
+    }
+
+    public LiveData<List<LocationModel>> getTrackLocations(String trackUuid) {
+        return mLocationDao.getTrackLocations(trackUuid);
     }
 
     public void insert(final LocationModel location) {

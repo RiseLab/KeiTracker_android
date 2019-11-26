@@ -7,7 +7,8 @@ Android tracking application
 - [ ] GPS service availability check
 - [ ] App state saving mechanism
 - [x] Save tracks to database
-- [ ] Implement ViewModel and RecyclerView to show tracks data
+- [x] Implement ViewModel and RecyclerView to show tracks data
 - [ ] Create separate table for tracks, allow changing track name
+- [ ] Allow deleting tracks
 - [ ] Implement Google Maps and draw tracks
 - [ ] Improve UI (navigation, color scheme, etc.)

@@ -28,15 +28,15 @@ import ru.riselab.keitracker.db.viewmodel.LocationViewModel;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static final String EXTRA_TRACK_UUID =
+            "ru.riselab.keitracker.extra.TRACK_UUID";
+
     private static final int REQUEST_PERMISSIONS = 1;
     private static final String TRACKING_LOCATION_KEY = "tracking_location";
 
     private FloatingActionButton mFab;
 
     private boolean mTrackingLocation;
-
-    private LocationDao mLocationDao;
-    private LocationViewModel mLocationViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,9 +54,9 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        mLocationViewModel = new ViewModelProvider(this).get(LocationViewModel.class);
+        LocationViewModel locationViewModel = new ViewModelProvider(this).get(LocationViewModel.class);
 
-        mLocationViewModel.getAllTracks().observe(this, new Observer<List<Track>>() {
+        locationViewModel.getAllTracks().observe(this, new Observer<List<Track>>() {
             @Override
             public void onChanged(@Nullable final List<Track> tracks) {
                 adapter.setTracks(tracks);

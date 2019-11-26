@@ -20,5 +20,8 @@ public interface LocationDao {
     LocationModel getLocation(Integer id);
 
     @Query("SELECT track_uuid, MIN(fixed_at) first_time, MAX(fixed_at) last_time FROM location GROUP BY track_uuid ORDER BY first_time")
-    LiveData<List<Track>> getTracks();
+    LiveData<List<Track>> getAllTracks();
+
+    @Query("SELECT * FROM location WHERE track_uuid = :trackUuid")
+    LiveData<List<LocationModel>> getTrackLocations(String trackUuid);
 }

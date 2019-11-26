@@ -1,6 +1,7 @@
 package ru.riselab.keitracker.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,20 +16,37 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 
+import ru.riselab.keitracker.MainActivity;
 import ru.riselab.keitracker.R;
+import ru.riselab.keitracker.TrackActivity;
 import ru.riselab.keitracker.db.pojo.Track;
 
 public class TrackListAdapter extends RecyclerView.Adapter<TrackListAdapter.TrackViewHolder> {
 
-    class TrackViewHolder extends RecyclerView.ViewHolder {
+    class TrackViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
+        private final Context context;
         private final TextView trackItemNameView;
         private final TextView trackItemInfoView;
 
-        private TrackViewHolder(View itemView) {
+        private TrackViewHolder(@NonNull View itemView) {
             super(itemView);
+
+            context = itemView.getContext();
+
             trackItemNameView = itemView.findViewById(R.id.trackItemName);
             trackItemInfoView = itemView.findViewById(R.id.trackItemInfo);
+
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            int position = getLayoutPosition();
+            Track current = mTracks.get(position);
+            Intent intent = new Intent(context, TrackActivity.class);
+            intent.putExtra(MainActivity.EXTRA_TRACK_UUID, current.trackUuid);
+            context.startActivity(intent);
         }
     }
 
