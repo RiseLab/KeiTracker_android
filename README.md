@@ -8,6 +8,7 @@ Android tracking application
 - [ ] App state saving mechanism
 - [x] Save tracks to database
 - [x] Implement ViewModel and RecyclerView to show tracks data
+- [ ] Convert all activities to fragments (if possible)
 - [ ] Create separate table for tracks, allow changing track name
 - [ ] Allow deleting tracks
 - [ ] Implement Google Maps and draw tracks
