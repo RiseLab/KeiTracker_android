@@ -63,6 +63,9 @@ public class TrackMapTabFragment extends Fragment implements OnMapReadyCallback 
                     public void onChanged(List<LocationModel> points) {
                         DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.getDefault());
                         if (points.size() != 0) {
+                            if (mMap != null) {
+                                mMap.clear();
+                            }
                             LatLng latLng = new LatLng(
                                     points.get(0).getLatitude(),
                                     points.get(0).getLongitude()
