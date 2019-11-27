@@ -1,12 +1,11 @@
 package ru.riselab.keitracker.db.dao;
 
+import java.util.List;
+
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
-
-import java.util.List;
-
 import ru.riselab.keitracker.db.model.LocationModel;
 import ru.riselab.keitracker.db.pojo.Track;
 
@@ -24,4 +23,7 @@ public interface LocationDao {
 
     @Query("SELECT * FROM location WHERE track_uuid = :trackUuid")
     LiveData<List<LocationModel>> getTrackLocations(String trackUuid);
+
+    @Query("DELETE FROM location WHERE track_uuid = :trackUuid")
+    void deleteTrackLocations(String trackUuid);
 }

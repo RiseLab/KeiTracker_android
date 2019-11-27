@@ -2,4 +2,6 @@
     <string name="app_name">KeiTracker</string>
     <string name="location_text">"Latitude: %1$.4f\nLongitude: %2$.4f\nTimestamp: %3$tT"</string>
     <string name="location_failed">Location is not available</string>
+    <string name="track_option_share">Share</string>
+    <string name="track_option_delete">Delete</string>
 </resources>

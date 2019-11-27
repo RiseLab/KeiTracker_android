@@ -34,7 +34,6 @@ public class MainActivity extends AppCompatActivity {
             "ru.riselab.keitracker.extra.TRACK_UUID";
 
     private static final int REQUEST_PERMISSIONS = 1;
-    private static final String TRACKING_LOCATION_KEY = "tracking_location";
 
     private FloatingActionButton mFab;
 

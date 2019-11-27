@@ -31,8 +31,4 @@ public class LocationViewModel extends AndroidViewModel {
     public LiveData<List<LocationModel>> getTrackLocations(String trackUuid) {
         return mRepository.getTrackLocations(trackUuid);
     }
-
-    public void insert(LocationModel location) {
-        mRepository.insert(location);
-    }
 }
