@@ -1,11 +1,18 @@
 package ru.riselab.keitracker;
 
 
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.core.content.FileProvider;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -19,6 +26,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -30,7 +40,7 @@ import ru.riselab.keitracker.db.viewmodel.LocationViewModel;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class TrackMapTabFragment extends Fragment implements OnMapReadyCallback {
+public class TrackMapTabFragment extends Fragment implements OnMapReadyCallback, GoogleMap.SnapshotReadyCallback {
 
     private GoogleMap mMap;
 
@@ -97,8 +107,42 @@ public class TrackMapTabFragment extends Fragment implements OnMapReadyCallback 
         return rootView;
     }
 
+    public void getSnapshot() {
+        if (mMap != null) {
+            mMap.snapshot(this);
+        }
+    }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+    }
+
+    @Override
+    public void onSnapshotReady(Bitmap bitmap) {
+        // TODO: refactor
+        File imagesFolder = new File(getActivity().getCacheDir(), "images");
+        Uri uri = null;
+
+        try {
+            imagesFolder.mkdirs();
+            File file = new File(imagesFolder, "shared_image.png");
+            FileOutputStream stream = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream);
+            stream.flush();
+            stream.close();
+            uri = FileProvider.getUriForFile(getActivity(), BuildConfig.APPLICATION_ID + ".fileprovider", file);
+        } catch (IOException e) {
+            // TODO: process exception
+        }
+
+        if (uri != null) {
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            intent.putExtra(Intent.EXTRA_STREAM, uri);
+            intent.putExtra(Intent.EXTRA_TEXT, getString(R.string.sended_from));
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.setType("image/png");
+            startActivity(Intent.createChooser(intent, getString(R.string.share_with)));
+        }
     }
 }

@@ -2,18 +2,22 @@ package ru.riselab.keitracker;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import com.google.android.material.tabs.TabLayout;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
+
+import com.google.android.material.tabs.TabLayout;
+
 import ru.riselab.keitracker.adapters.TrackTabsPagerAdapter;
 import ru.riselab.keitracker.db.repository.LocationRepository;
 
 public class TrackActivity extends AppCompatActivity {
+
+    private TrackMapTabFragment mTrackMapTabFragment;
 
     private String mTrackUuid = "";
     private LocationRepository mLocationRepository;
@@ -37,6 +41,8 @@ public class TrackActivity extends AppCompatActivity {
         final ViewPager trackViewPager = findViewById(R.id.trackViewPager);
         final TrackTabsPagerAdapter trackTabsPagerAdapter = new TrackTabsPagerAdapter(
                 getSupportFragmentManager(), trackTabLayout.getTabCount());
+
+        mTrackMapTabFragment = (TrackMapTabFragment) trackTabsPagerAdapter.getItem(1);
 
         trackViewPager.setAdapter(trackTabsPagerAdapter);
 
@@ -75,6 +81,7 @@ public class TrackActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.track_option_share:
                 // TODO: capture map and open share dialog
+                mTrackMapTabFragment.getSnapshot();
                 return true;
             case R.id.track_option_delete:
                 // TODO: check if track is active

@@ -4,4 +4,6 @@
     <string name="location_failed">Location is not available</string>
     <string name="track_option_share">Share</string>
     <string name="track_option_delete">Delete</string>
+    <string name="sended_from">Sended from KeiTracker</string>
+    <string name="share_with">Share with</string>
 </resources>

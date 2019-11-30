@@ -12,6 +12,7 @@ Android tracking application
 - [ ] Create separate table for tracks, allow changing track name
 - [x] Allow deleting tracks
 - [ ] Add settings page
-- [ ] Add "Share" function
+- [x] Add "Share" function
 - [x] Implement Google Maps and draw tracks
+- [ ] Add language support
 - [ ] Improve UI (navigation, color scheme, etc.)

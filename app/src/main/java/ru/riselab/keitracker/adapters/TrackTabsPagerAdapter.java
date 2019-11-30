@@ -12,6 +12,9 @@ public class TrackTabsPagerAdapter extends FragmentStatePagerAdapter {
 
     private int mNumOfTabs;
 
+    private TrackPointsTabFragment mTrackPointsTabFragment;
+    private TrackMapTabFragment mTrackMapTabFragment;
+
     public TrackTabsPagerAdapter(@NonNull FragmentManager fm, int numOfTabs) {
         super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         this.mNumOfTabs = numOfTabs;
@@ -20,10 +23,16 @@ public class TrackTabsPagerAdapter extends FragmentStatePagerAdapter {
     @NonNull
     @Override
     public Fragment getItem(int position) {
-        if (position == 1) {
-            return new TrackMapTabFragment();
+        if (position == 0) {
+            if (mTrackPointsTabFragment == null) {
+                mTrackPointsTabFragment = new TrackPointsTabFragment();
+            }
+            return mTrackPointsTabFragment;
         }
-        return new TrackPointsTabFragment();
+        if (mTrackMapTabFragment == null) {
+            mTrackMapTabFragment = new TrackMapTabFragment();
+        }
+        return mTrackMapTabFragment;
     }
 
     @Override
