@@ -1,9 +1,12 @@
 package ru.riselab.keitracker;
 
 import android.Manifest;
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -22,7 +25,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.List;
 
 import ru.riselab.keitracker.adapters.TrackListAdapter;
-import ru.riselab.keitracker.db.dao.LocationDao;
 import ru.riselab.keitracker.db.pojo.Track;
 import ru.riselab.keitracker.db.viewmodel.LocationViewModel;
 
@@ -32,11 +34,8 @@ public class MainActivity extends AppCompatActivity {
             "ru.riselab.keitracker.extra.TRACK_UUID";
 
     private static final int REQUEST_PERMISSIONS = 1;
-    private static final String TRACKING_LOCATION_KEY = "tracking_location";
 
     private FloatingActionButton mFab;
-
-    private boolean mTrackingLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,9 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
         mFab = findViewById(R.id.fab);
 
-        /*if (savedInstanceState != null) {
-            mTrackingLocation = savedInstanceState.getBoolean(TRACKING_LOCATION_KEY);
-        }*/
+        mFab.setImageResource(isLocationServiceRunning() ? R.drawable.ic_stop_tracking : R.drawable.ic_start_tracking);
 
         RecyclerView recyclerView = findViewById(R.id.mainTrackList);
         final TrackListAdapter adapter = new TrackListAdapter(this);
@@ -85,31 +82,30 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-
-        /*outState.putBoolean(TRACKING_LOCATION_KEY, mTrackingLocation);*/
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-
-        /*if (mTrackingLocation) {
-            stopTrackingLocation();
-            mTrackingLocation = true;
-        }*/
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+    }
 
-        /*if (mTrackingLocation) {
-            stopTrackingLocation();
-        }*/
+    public boolean isLocationServiceRunning() {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (ForegroundService.class.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void buttonLocationClick(View view) {
-        if (!mTrackingLocation) {
+        if (!isLocationServiceRunning()) {
             startTrackingLocation();
         } else {
             stopTrackingLocation();
@@ -123,15 +119,13 @@ public class MainActivity extends AppCompatActivity {
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_PERMISSIONS);
         } else {
             startForegroundService();
-            mTrackingLocation = true;
             mFab.setImageResource(R.drawable.ic_stop_tracking);
         }
     }
 
     private void stopTrackingLocation() {
-        if (mTrackingLocation) {
+        if (isLocationServiceRunning()) {
             stopForegroundService();
-            mTrackingLocation = false;
             mFab.setImageResource(R.drawable.ic_start_tracking);
         }
     }

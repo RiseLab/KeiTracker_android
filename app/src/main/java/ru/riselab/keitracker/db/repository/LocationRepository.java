@@ -35,4 +35,10 @@ public class LocationRepository {
             mLocationDao.insert(location);
         });
     }
+
+    public void deleteTrackLocations(final String trackUuid) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            mLocationDao.deleteTrackLocations(trackUuid);
+        });
+    }
 }
