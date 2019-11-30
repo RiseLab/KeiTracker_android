@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -26,13 +25,13 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.List;
 
 import ru.riselab.keitracker.adapters.TrackListAdapter;
-import ru.riselab.keitracker.db.pojo.Track;
-import ru.riselab.keitracker.db.viewmodel.LocationViewModel;
+import ru.riselab.keitracker.db.model.TrackModel;
+import ru.riselab.keitracker.db.viewmodel.TrackViewModel;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final String EXTRA_TRACK_UUID =
-            "ru.riselab.keitracker.extra.TRACK_UUID";
+    public static final String EXTRA_TRACK_ID =
+            "ru.riselab.keitracker.extra.TRACK_ID";
 
     private static final int REQUEST_PERMISSIONS = 1;
 
@@ -55,11 +54,11 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        LocationViewModel locationViewModel = new ViewModelProvider(this).get(LocationViewModel.class);
+        TrackViewModel trackViewModel = new ViewModelProvider(this).get(TrackViewModel.class);
 
-        locationViewModel.getAllTracks().observe(this, new Observer<List<Track>>() {
+        trackViewModel.getAllTracks().observe(this, new Observer<List<TrackModel>>() {
             @Override
-            public void onChanged(@Nullable final List<Track> tracks) {
+            public void onChanged(@Nullable final List<TrackModel> tracks) {
                 adapter.setTracks(tracks);
                 mProgressBar.setVisibility(View.GONE);
             }

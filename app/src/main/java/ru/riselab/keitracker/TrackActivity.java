@@ -2,7 +2,6 @@ package ru.riselab.keitracker;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -13,14 +12,16 @@ import androidx.viewpager.widget.ViewPager;
 import com.google.android.material.tabs.TabLayout;
 
 import ru.riselab.keitracker.adapters.TrackTabsPagerAdapter;
-import ru.riselab.keitracker.db.repository.LocationRepository;
+import ru.riselab.keitracker.db.repository.PointRepository;
+import ru.riselab.keitracker.db.repository.TrackRepository;
 
 public class TrackActivity extends AppCompatActivity {
 
     private TrackMapTabFragment mTrackMapTabFragment;
 
-    private String mTrackUuid = "";
-    private LocationRepository mLocationRepository;
+    private Integer mTrackId;
+    private TrackRepository mTrackRepository;
+    private PointRepository mPointRepository;
 
 
     @Override
@@ -28,10 +29,11 @@ public class TrackActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_track);
 
-        mLocationRepository = new LocationRepository(getApplication());
+        mTrackRepository = new TrackRepository(getApplication());
+        mPointRepository = new PointRepository(getApplication());
 
         Intent intent = getIntent();
-        mTrackUuid = intent.getStringExtra(MainActivity.EXTRA_TRACK_UUID);
+        mTrackId = intent.getIntExtra(MainActivity.EXTRA_TRACK_ID, 0);
 
         TabLayout trackTabLayout = findViewById(R.id.trackTabLayout);
 
@@ -65,8 +67,8 @@ public class TrackActivity extends AppCompatActivity {
         });
     }
 
-    public String getTrackUuid() {
-        return mTrackUuid;
+    public Integer getTrackId() {
+        return mTrackId;
     }
 
     @Override
@@ -85,7 +87,8 @@ public class TrackActivity extends AppCompatActivity {
                 return true;
             case R.id.track_option_delete:
                 // TODO: check if track is active
-                mLocationRepository.deleteTrackLocations(mTrackUuid);
+                mTrackRepository.delete(mTrackId);
+                mPointRepository.deleteTrackPoints(mTrackId);
                 Intent intent = new Intent(this, MainActivity.class);
                 startActivity(intent);
             default:

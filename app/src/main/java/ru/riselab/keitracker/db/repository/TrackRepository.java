@@ -15,6 +15,8 @@ public class TrackRepository {
     private TrackDao mTrackDao;
     private LiveData<List<TrackModel>> mAllTracks;
 
+    private Integer mLastInsertedId;
+
     public TrackRepository(Application application) {
         AppDatabase db = AppDatabase.getDatabase(application);
         mTrackDao = db.trackDao();
@@ -27,7 +29,7 @@ public class TrackRepository {
 
     public void insert(final TrackModel track) {
         AppDatabase.databaseWriteExecutor.execute(() -> {
-            mTrackDao.insert(track);
+            mLastInsertedId = mTrackDao.insert(track).intValue();
         });
     }
 
@@ -35,5 +37,9 @@ public class TrackRepository {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             mTrackDao.delete(trackId);
         });
+    }
+
+    public Integer getLastInsertedId() {
+        return mLastInsertedId;
     }
 }

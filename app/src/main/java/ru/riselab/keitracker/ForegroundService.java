@@ -12,7 +12,6 @@ import android.os.IBinder;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -21,20 +20,22 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
 import java.util.Date;
-import java.util.UUID;
 
-import ru.riselab.keitracker.db.model.LocationModel;
-import ru.riselab.keitracker.db.repository.LocationRepository;
-import ru.riselab.keitracker.db.viewmodel.LocationViewModel;
+import ru.riselab.keitracker.db.model.PointModel;
+import ru.riselab.keitracker.db.model.TrackModel;
+import ru.riselab.keitracker.db.repository.PointRepository;
+import ru.riselab.keitracker.db.repository.TrackRepository;
 
 public class ForegroundService extends Service {
 
     public static final int SERVICE_ID = 1;
     public static final String CHANNEL_ID = "ForegroundServiceChannel";
 
-    private String mTrackUuid;
+    private Integer mTrackId;
 
-    private LocationRepository mLocationRepository;
+    private TrackRepository mTrackRepository;
+    private PointRepository mPointRepository;
+
     private Location mLastLocation;
     private LocationCallback mLocationCallback;
     private FusedLocationProviderClient mFusedLocationClient;
@@ -43,11 +44,15 @@ public class ForegroundService extends Service {
     public void onCreate() {
         super.onCreate();
 
-        mTrackUuid = UUID.randomUUID().toString();
-
-        mLocationRepository = new LocationRepository(getApplication());
+        mTrackRepository = new TrackRepository(getApplication());
+        mPointRepository = new PointRepository(getApplication());
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        Date date = new Date();
+        TrackModel trackModel = new TrackModel(null,
+                date.getTime(), null);
+        mTrackRepository.insert(trackModel);
 
         mLocationCallback = new LocationCallback() {
             @Override
@@ -56,12 +61,12 @@ public class ForegroundService extends Service {
 
                 mLastLocation = locationResult.getLastLocation();
 
-                LocationModel locationModel = new LocationModel(mTrackUuid,
+                PointModel pointModel = new PointModel(mTrackRepository.getLastInsertedId(),
                         mLastLocation.getLatitude(),
                         mLastLocation.getLongitude(),
                         mLastLocation.getAltitude(),
-                        new Date());
-                mLocationRepository.insert(locationModel);
+                        mLastLocation.getTime());
+                mPointRepository.insert(pointModel);
 
                 String locationText = getString(R.string.location_text,
                         mLastLocation.getLatitude(),

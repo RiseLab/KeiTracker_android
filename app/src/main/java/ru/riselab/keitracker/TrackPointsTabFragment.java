@@ -17,8 +17,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 import ru.riselab.keitracker.adapters.PointListAdapter;
-import ru.riselab.keitracker.db.model.LocationModel;
-import ru.riselab.keitracker.db.viewmodel.LocationViewModel;
+import ru.riselab.keitracker.db.model.PointModel;
+import ru.riselab.keitracker.db.viewmodel.PointViewModel;
 
 
 /**
@@ -47,15 +47,15 @@ public class TrackPointsTabFragment extends Fragment {
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
 
-        LocationViewModel locationViewModel = new ViewModelProvider(this).get(LocationViewModel.class);
+        PointViewModel pointViewModel = new ViewModelProvider(this).get(PointViewModel.class);
 
         TrackActivity trackActivity = (TrackActivity) getActivity();
-        String trackUuid = (trackActivity != null) ? trackActivity.getTrackUuid() : "";
+        Integer trackId = (trackActivity != null) ? trackActivity.getTrackId() : null;
 
-        locationViewModel.getTrackLocations(trackUuid).observe(
-                this.getViewLifecycleOwner(), new Observer<List<LocationModel>>() {
+        pointViewModel.getTrackPoints(trackId).observe(
+                this.getViewLifecycleOwner(), new Observer<List<PointModel>>() {
                     @Override
-                    public void onChanged(@Nullable List<LocationModel> points) {
+                    public void onChanged(@Nullable List<PointModel> points) {
                         adapter.setPoints(points);
                         mProgressBar.setVisibility(View.GONE);
                     }

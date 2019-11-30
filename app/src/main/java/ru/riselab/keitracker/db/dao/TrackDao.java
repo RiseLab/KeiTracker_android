@@ -13,7 +13,7 @@ import ru.riselab.keitracker.db.model.TrackModel;
 public interface TrackDao {
 
     @Insert
-    void insert(TrackModel track);
+    Long insert(TrackModel track);
 
     @Query("DELETE FROM track WHERE id = :id")
     void delete(Integer id);

@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Locale;
 
 import ru.riselab.keitracker.R;
-import ru.riselab.keitracker.db.model.LocationModel;
+import ru.riselab.keitracker.db.model.PointModel;
 
 public class PointListAdapter extends RecyclerView.Adapter<PointListAdapter.PointViewHolder> {
 
@@ -34,7 +34,7 @@ public class PointListAdapter extends RecyclerView.Adapter<PointListAdapter.Poin
     }
 
     private final LayoutInflater mInflater;
-    private List<LocationModel> mPoints;
+    private List<PointModel> mPoints;
 
     public PointListAdapter(Context context) {
         mInflater = LayoutInflater.from(context);
@@ -50,7 +50,7 @@ public class PointListAdapter extends RecyclerView.Adapter<PointListAdapter.Poin
     @Override
     public void onBindViewHolder(@NonNull PointViewHolder holder, int position) {
         if (mPoints != null) {
-            LocationModel current = mPoints.get(position);
+            PointModel current = mPoints.get(position);
             DateFormat dateFormat = new SimpleDateFormat(
                     "dd.MM.yyyy HH:mm:ss", Locale.getDefault());
             String pointTextString = String.format(
@@ -66,7 +66,7 @@ public class PointListAdapter extends RecyclerView.Adapter<PointListAdapter.Poin
         }
     }
 
-    public void setPoints(List<LocationModel> points) {
+    public void setPoints(List<PointModel> points) {
         mPoints = points;
         notifyDataSetChanged();
     }

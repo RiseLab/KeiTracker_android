@@ -13,13 +13,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 import ru.riselab.keitracker.MainActivity;
 import ru.riselab.keitracker.R;
 import ru.riselab.keitracker.TrackActivity;
-import ru.riselab.keitracker.db.pojo.Track;
+import ru.riselab.keitracker.db.model.TrackModel;
 
 public class TrackListAdapter extends RecyclerView.Adapter<TrackListAdapter.TrackViewHolder> {
 
@@ -43,15 +44,15 @@ public class TrackListAdapter extends RecyclerView.Adapter<TrackListAdapter.Trac
         @Override
         public void onClick(View v) {
             int position = getLayoutPosition();
-            Track current = mTracks.get(position);
+            TrackModel current = mTracks.get(position);
             Intent intent = new Intent(context, TrackActivity.class);
-            intent.putExtra(MainActivity.EXTRA_TRACK_UUID, current.trackUuid);
+            intent.putExtra(MainActivity.EXTRA_TRACK_ID, current.getId());
             context.startActivity(intent);
         }
     }
 
     private final LayoutInflater mInflater;
-    private List<Track> mTracks;
+    private List<TrackModel> mTracks;
 
     public TrackListAdapter(Context context) {
         mInflater = LayoutInflater.from(context);
@@ -67,19 +68,27 @@ public class TrackListAdapter extends RecyclerView.Adapter<TrackListAdapter.Trac
     @Override
     public void onBindViewHolder(@NonNull TrackViewHolder holder, int position) {
         if (mTracks != null) {
-            Track current = mTracks.get(position);
+            // TODO: refactor
+            TrackModel current = mTracks.get(position);
             DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.getDefault());
-            String trackInfoString = String.format("<i>from <b>%s</b> to <b>%s</b></i>",
-                    dateFormat.format(current.firstTime),
-                    dateFormat.format(current.lastTime));
-            holder.trackItemNameView.setText(String.format("%s) %s", position + 1, current.trackUuid));
+
+            String trackNameString = (current.getName() != null) ? current.getName() : "Track #" + current.getId();
+
+            String trackInfoString = String.format("<i>started: <b>%s</b>",
+                    dateFormat.format(new Date(current.getStartedAt())));
+            if (current.getStoppedAt() != null) {
+                trackInfoString += String.format(", <i>stopped: <b>%s</b>",
+                        dateFormat.format(new Date(current.getStoppedAt())));
+            }
+
+            holder.trackItemNameView.setText(String.format("%s) %s", position + 1, trackNameString));
             holder.trackItemInfoView.setText(Html.fromHtml(trackInfoString));
         } else {
             // TODO: process data not ready case
         }
     }
 
-    public void setTracks(List<Track> tracks) {
+    public void setTracks(List<TrackModel> tracks) {
         mTracks = tracks;
         notifyDataSetChanged();
     }
