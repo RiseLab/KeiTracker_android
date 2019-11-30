@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -35,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int REQUEST_PERMISSIONS = 1;
 
+    private ProgressBar mProgressBar;
     private FloatingActionButton mFab;
 
     @Override
@@ -42,8 +44,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mFab = findViewById(R.id.fab);
+        mProgressBar = findViewById(R.id.progressBar);
+        mProgressBar.setVisibility(View.VISIBLE);
 
+        mFab = findViewById(R.id.fab);
         mFab.setImageResource(isLocationServiceRunning() ? R.drawable.ic_stop_tracking : R.drawable.ic_start_tracking);
 
         RecyclerView recyclerView = findViewById(R.id.mainTrackList);
@@ -57,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(@Nullable final List<Track> tracks) {
                 adapter.setTracks(tracks);
+                mProgressBar.setVisibility(View.GONE);
             }
         });
 

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -25,6 +26,7 @@ import ru.riselab.keitracker.db.viewmodel.LocationViewModel;
  */
 public class TrackPointsTabFragment extends Fragment {
 
+    private ProgressBar mProgressBar;
 
     public TrackPointsTabFragment() {
         // Required empty public constructor
@@ -36,6 +38,9 @@ public class TrackPointsTabFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_track_points_tab, container, false);
+
+        mProgressBar = rootView.findViewById(R.id.progressBar);
+        mProgressBar.setVisibility(View.VISIBLE);
 
         RecyclerView recyclerView = rootView.findViewById(R.id.trackLocationList);
         final PointListAdapter adapter = new PointListAdapter(this.getContext());
@@ -52,6 +57,7 @@ public class TrackPointsTabFragment extends Fragment {
                     @Override
                     public void onChanged(@Nullable List<LocationModel> points) {
                         adapter.setPoints(points);
+                        mProgressBar.setVisibility(View.GONE);
                     }
                 }
         );
