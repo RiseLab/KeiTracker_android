@@ -17,5 +17,4 @@ Android tracking application
 - [ ] Add language support
 - [ ] Improve UI (navigation, color scheme, etc.)
 - [ ] Implement Firebase for communication
-- [ ] G1oogle PlayMarket               0*[3y]: 
-+++++88
+- [ ] Google PlayMarket
