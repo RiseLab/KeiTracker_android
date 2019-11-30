@@ -27,6 +27,10 @@ public class TrackRepository {
         return mAllTracks;
     }
 
+    public LiveData<TrackModel> getTrack(Integer id) {
+        return mTrackDao.getTrack(id);
+    }
+
     public void insert(final TrackModel track) {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             mLastInsertedId = mTrackDao.insert(track).intValue();
@@ -36,6 +40,12 @@ public class TrackRepository {
     public void delete(final Integer trackId) {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             mTrackDao.delete(trackId);
+        });
+    }
+
+    public void update(final TrackModel track) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            mTrackDao.update(track);
         });
     }
 

@@ -74,17 +74,17 @@ public class TrackMapTabFragment extends Fragment implements OnMapReadyCallback,
 
                             CircleOptions circleOptions = new CircleOptions()
                                     .center(latLng)
-                                    .radius(3)
+                                    .radius(0.5)
                                     .strokeWidth(10)
-                                    .strokeColor(ResourcesCompat.getColor(getResources(), R.color.colorAccent, null))
-                                    .fillColor(ResourcesCompat.getColor(getResources(), R.color.colorPrimaryDark, null))
+                                    .strokeColor(ResourcesCompat.getColor(getResources(), R.color.colorPrimaryDark2, null))
+                                    .fillColor(ResourcesCompat.getColor(getResources(), R.color.colorAccent2, null))
                                     .zIndex(11);
                             mMap.addCircle(circleOptions);
 
                             builder.include(latLng);
 
                             polylineOptions.add(latLng)
-                                    .color(ResourcesCompat.getColor(getResources(), R.color.colorAccent, null))
+                                    .color(ResourcesCompat.getColor(getResources(), R.color.colorAccent2, null))
                                     .width(10)
                                     .zIndex(10);
                         }

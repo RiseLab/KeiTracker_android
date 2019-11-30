@@ -72,8 +72,6 @@ public class TrackListAdapter extends RecyclerView.Adapter<TrackListAdapter.Trac
             TrackModel current = mTracks.get(position);
             DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.getDefault());
 
-            String trackNameString = (current.getName() != null) ? current.getName() : "Track #" + current.getId();
-
             String trackInfoString = String.format("<i>started: <b>%s</b>",
                     dateFormat.format(new Date(current.getStartedAt())));
             if (current.getStoppedAt() != null) {
@@ -81,7 +79,7 @@ public class TrackListAdapter extends RecyclerView.Adapter<TrackListAdapter.Trac
                         dateFormat.format(new Date(current.getStoppedAt())));
             }
 
-            holder.trackItemNameView.setText(String.format("%s) %s", position + 1, trackNameString));
+            holder.trackItemNameView.setText(String.format("%s) %s", position + 1, current.getName()));
             holder.trackItemInfoView.setText(Html.fromHtml(trackInfoString));
         } else {
             // TODO: process data not ready case

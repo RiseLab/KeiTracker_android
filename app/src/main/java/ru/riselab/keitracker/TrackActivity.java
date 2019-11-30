@@ -1,25 +1,35 @@
 package ru.riselab.keitracker;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
 
 import ru.riselab.keitracker.adapters.TrackTabsPagerAdapter;
+import ru.riselab.keitracker.db.model.TrackModel;
 import ru.riselab.keitracker.db.repository.PointRepository;
 import ru.riselab.keitracker.db.repository.TrackRepository;
+import ru.riselab.keitracker.db.viewmodel.TrackViewModel;
 
 public class TrackActivity extends AppCompatActivity {
 
     private TrackMapTabFragment mTrackMapTabFragment;
 
     private Integer mTrackId;
+    private TrackModel mTrackModel;
     private TrackRepository mTrackRepository;
     private PointRepository mPointRepository;
 
@@ -34,6 +44,17 @@ public class TrackActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         mTrackId = intent.getIntExtra(MainActivity.EXTRA_TRACK_ID, 0);
+
+        TrackViewModel trackViewModel = new ViewModelProvider(this).get(TrackViewModel.class);
+        trackViewModel.getTrack(mTrackId).observe(this, new Observer<TrackModel>() {
+            @Override
+            public void onChanged(TrackModel trackModel) {
+                mTrackModel = trackModel;
+                if (trackModel != null) {
+                    setTitle(trackModel.getName());
+                }
+            }
+        });
 
         TabLayout trackTabLayout = findViewById(R.id.trackTabLayout);
 
@@ -80,17 +101,59 @@ public class TrackActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = getLayoutInflater();
+
         switch (item.getItemId()) {
             case R.id.track_option_share:
-                // TODO: capture map and open share dialog
                 mTrackMapTabFragment.getSnapshot();
+                return true;
+            case R.id.track_option_edit:
+                View dialogEditTrackView = inflater.inflate(R.layout.dialog_edit_track, null);
+                EditText trackNameView = dialogEditTrackView.findViewById(R.id.trackName);
+                trackNameView.setText(mTrackModel.getName());
+                builder.setView(dialogEditTrackView)
+                        .setTitle(getString((R.string.track_dialog_edit)))
+                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                String trackNameValue = trackNameView.getText().toString();
+
+                                if (trackNameValue.length() > 0) {
+                                    mTrackModel.setName(trackNameValue);
+                                    mTrackRepository.update(mTrackModel);
+                                }
+
+                            }
+                        })
+                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        });
+                builder.create().show();
                 return true;
             case R.id.track_option_delete:
                 // TODO: check if track is active
-                mTrackRepository.delete(mTrackId);
-                mPointRepository.deleteTrackPoints(mTrackId);
                 Intent intent = new Intent(this, MainActivity.class);
-                startActivity(intent);
+
+                builder.setTitle(getString((R.string.track_dialog_delete)))
+                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                mTrackRepository.delete(mTrackId);
+                                mPointRepository.deleteTrackPoints(mTrackId);
+                                startActivity(intent);
+                            }
+                        })
+                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        });
+                builder.create().show();
             default:
                 return super.onOptionsItemSelected(item);
         }

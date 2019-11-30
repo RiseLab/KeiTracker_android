@@ -26,4 +26,8 @@ public class TrackViewModel extends AndroidViewModel {
     public LiveData<List<TrackModel>> getAllTracks() {
         return mAllTracks;
     }
+
+    public LiveData<TrackModel> getTrack(Integer id) {
+        return mRepository.getTrack(id);
+    }
 }

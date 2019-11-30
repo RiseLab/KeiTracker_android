@@ -49,11 +49,6 @@ public class ForegroundService extends Service {
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        Date date = new Date();
-        TrackModel trackModel = new TrackModel(null,
-                date.getTime(), null);
-        mTrackRepository.insert(trackModel);
-
         mLocationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
@@ -79,15 +74,19 @@ public class ForegroundService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        String input = intent.getStringExtra("inputExtra");
+        String trackName = intent.getStringExtra(MainActivity.EXTRA_TRACK_NAME);
         createNotificationChannel();
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this,
                 0, notificationIntent, 0);
 
+        Date date = new Date();
+        TrackModel trackModel = new TrackModel(trackName, date.getTime(), null);
+        mTrackRepository.insert(trackModel);
+
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle(getString(R.string.app_name))
-                .setContentText(input)
+                .setContentText(String.format("%s: %s", getString(R.string.start_recording_new_track), trackName))
                 .setSmallIcon(R.drawable.ic_directions_walk_black_24dp)
                 .setContentIntent(pendingIntent)
                 .build();

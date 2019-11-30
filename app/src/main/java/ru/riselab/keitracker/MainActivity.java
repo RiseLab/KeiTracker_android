@@ -3,15 +3,19 @@ package ru.riselab.keitracker;
 import android.Manifest;
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.Observer;
@@ -30,8 +34,8 @@ import ru.riselab.keitracker.db.viewmodel.TrackViewModel;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final String EXTRA_TRACK_ID =
-            "ru.riselab.keitracker.extra.TRACK_ID";
+    public static final String EXTRA_TRACK_ID = "ru.riselab.keitracker.extra.TRACK_ID";
+    public static final String EXTRA_TRACK_NAME = "ru.riselab.keitracker.extra.TRACK_NAME";
 
     private static final int REQUEST_PERMISSIONS = 1;
 
@@ -122,8 +126,30 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_PERMISSIONS);
         } else {
-            startForegroundService();
-            mFab.setImageResource(R.drawable.ic_stop_tracking);
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            LayoutInflater inflater = getLayoutInflater();
+            View dialogEditTrackView = inflater.inflate(R.layout.dialog_edit_track, null);
+            EditText trackNameView = dialogEditTrackView.findViewById(R.id.trackName);
+            builder.setView(dialogEditTrackView)
+                    .setTitle(getString((R.string.track_dialog_new)))
+                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            String trackName = trackNameView.getText().toString();
+                            if (trackName.length() == 0) {
+                                trackName = getString(R.string.unnamed_track);
+                            }
+                            startForegroundService(trackName);
+                            mFab.setImageResource(R.drawable.ic_stop_tracking);
+                        }
+                    })
+                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+            builder.create().show();
         }
     }
 
@@ -134,9 +160,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void startForegroundService() {
+    private void startForegroundService(String trackName) {
         Intent serviceIntent = new Intent(this, ForegroundService.class);
-        serviceIntent.putExtra("inputExtra", "Recording a New Track");
+        serviceIntent.putExtra(MainActivity.EXTRA_TRACK_NAME, trackName);
         ActivityCompat.startForegroundService(this, serviceIntent);
     }
 

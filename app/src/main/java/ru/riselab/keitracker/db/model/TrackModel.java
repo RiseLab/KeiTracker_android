@@ -13,7 +13,7 @@ public class TrackModel {
     @ColumnInfo(name = "id")
     private Integer mId;
 
-    @Nullable
+    @NonNull
     @ColumnInfo(name = "name")
     private String mName;
 
@@ -25,7 +25,7 @@ public class TrackModel {
     @ColumnInfo(name = "stopped_at")
     private Long mStoppedAt;
 
-    public TrackModel(@Nullable String name, @NonNull Long startedAt, @Nullable Long stoppedAt) {
+    public TrackModel(@NonNull String name, @NonNull Long startedAt, @Nullable Long stoppedAt) {
         mName = name;
         mStartedAt = startedAt;
         mStoppedAt = stoppedAt;
@@ -39,12 +39,12 @@ public class TrackModel {
         mId = id;
     }
 
-    @Nullable
+    @NonNull
     public String getName() {
         return mName;
     }
 
-    public void setName(@Nullable String name) {
+    public void setName(@NonNull String name) {
         mName = name;
     }
 

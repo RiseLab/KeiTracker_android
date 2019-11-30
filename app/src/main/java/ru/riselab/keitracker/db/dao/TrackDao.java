@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.Update;
 
 import java.util.List;
 
@@ -18,6 +19,12 @@ public interface TrackDao {
     @Query("DELETE FROM track WHERE id = :id")
     void delete(Integer id);
 
+    @Update
+    void update(TrackModel track);
+
     @Query("SELECT * FROM track ORDER BY id")
     LiveData<List<TrackModel>> getAllTracks();
+
+    @Query("SELECT * FROM track WHERE id = :id")
+    LiveData<TrackModel> getTrack(Integer id);
 }
