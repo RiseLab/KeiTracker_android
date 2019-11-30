@@ -15,4 +15,6 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="name">Name</string>
+    <string name="enable_gps">You should enable GPS</string>
+    <string name="settings">Settings</string>
 </resources>
