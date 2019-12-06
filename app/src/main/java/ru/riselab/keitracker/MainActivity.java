@@ -10,6 +10,8 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -20,7 +22,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.location.LocationManagerCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -91,8 +92,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_options, menu);
+        return true;
     }
 
     @Override
