@@ -6,18 +6,24 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Build;
 import android.os.IBinder;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+import androidx.preference.PreferenceManager;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Date;
 
@@ -31,7 +37,7 @@ public class ForegroundService extends Service {
     public static final int SERVICE_ID = 1;
     public static final String CHANNEL_ID = "ForegroundServiceChannel";
 
-    private Integer mTrackId;
+    private static final String CHECKPOINTS_REF = "checkpoints";
 
     private TrackRepository mTrackRepository;
     private PointRepository mPointRepository;
@@ -49,6 +55,14 @@ public class ForegroundService extends Service {
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean prefAnonymousTracking = sharedPreferences.getBoolean(
+                SettingsActivity.KEY_PREF_ANONYMOUS_TRACKING, false);
+
+        FirebaseDatabase firebaseDb = FirebaseDatabase.getInstance();
+        DatabaseReference firebaseDbRef = firebaseDb.getReference(CHECKPOINTS_REF);
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+
         mLocationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
@@ -56,6 +70,7 @@ public class ForegroundService extends Service {
 
                 mLastLocation = locationResult.getLastLocation();
 
+                // Save location data to Room DB
                 PointModel pointModel = new PointModel(mTrackRepository.getLastInsertedId(),
                         mLastLocation.getLatitude(),
                         mLastLocation.getLongitude(),
@@ -63,6 +78,14 @@ public class ForegroundService extends Service {
                         mLastLocation.getTime());
                 mPointRepository.insert(pointModel);
 
+                // Save location data to Firebase DB
+                if (firebaseUser != null && prefAnonymousTracking){
+                    firebaseDbRef.child(firebaseUser.getUid())
+                            .push()
+                            .setValue(pointModel);
+                }
+
+                // Show location data in notification
                 String locationText = getString(R.string.location_text,
                         mLastLocation.getLatitude(),
                         mLastLocation.getLongitude(),

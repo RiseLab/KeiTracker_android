@@ -2,9 +2,20 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+
+    <item
+        android:id="@+id/main_option_sign_in"
+        android:title="@string/sign_in"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/main_option_sign_out"
+        android:title="@string/sign_out"
+        android:visible="false"
+        app:showAsAction="never" />
+
     <item
         android:id="@+id/main_option_settings"
-        android:icon="@drawable/ic_action_settings"
         android:title="@string/settings"
         app:showAsAction="never" />
 

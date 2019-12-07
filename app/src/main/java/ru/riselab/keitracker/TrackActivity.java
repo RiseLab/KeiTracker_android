@@ -46,13 +46,10 @@ public class TrackActivity extends AppCompatActivity {
         mTrackId = intent.getIntExtra(MainActivity.EXTRA_TRACK_ID, 0);
 
         TrackViewModel trackViewModel = new ViewModelProvider(this).get(TrackViewModel.class);
-        trackViewModel.getTrack(mTrackId).observe(this, new Observer<TrackModel>() {
-            @Override
-            public void onChanged(TrackModel trackModel) {
-                mTrackModel = trackModel;
-                if (trackModel != null) {
-                    setTitle(trackModel.getName());
-                }
+        trackViewModel.getTrack(mTrackId).observe(this, trackModel -> {
+            mTrackModel = trackModel;
+            if (trackModel != null) {
+                setTitle(trackModel.getName());
             }
         });
 
@@ -114,17 +111,14 @@ public class TrackActivity extends AppCompatActivity {
                 trackNameView.setText(mTrackModel.getName());
                 builder.setView(dialogEditTrackView)
                         .setTitle(getString((R.string.track_dialog_edit)))
-                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                String trackNameValue = trackNameView.getText().toString();
+                        .setPositiveButton(R.string.ok, (dialog, which) -> {
+                            String trackNameValue = trackNameView.getText().toString();
 
-                                if (trackNameValue.length() > 0) {
-                                    mTrackModel.setName(trackNameValue);
-                                    mTrackRepository.update(mTrackModel);
-                                }
-
+                            if (trackNameValue.length() > 0) {
+                                mTrackModel.setName(trackNameValue);
+                                mTrackRepository.update(mTrackModel);
                             }
+
                         })
                         .setNegativeButton(R.string.cancel, null)
                         .show();
@@ -134,13 +128,10 @@ public class TrackActivity extends AppCompatActivity {
                 Intent intent = new Intent(this, MainActivity.class);
 
                 builder.setTitle(getString((R.string.track_dialog_delete)))
-                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                mTrackRepository.delete(mTrackId);
-                                mPointRepository.deleteTrackPoints(mTrackId);
-                                startActivity(intent);
-                            }
+                        .setPositiveButton(R.string.ok, (dialog, which) -> {
+                            mTrackRepository.delete(mTrackId);
+                            mPointRepository.deleteTrackPoints(mTrackId);
+                            startActivity(intent);
                         })
                         .setNegativeButton(R.string.cancel, null)
                         .show();
