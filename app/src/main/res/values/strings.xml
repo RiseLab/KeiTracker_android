@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">KeiTracker</string>
-    <string name="location_text">"Latitude: %1$.4f\nLongitude: %2$.4f\nTimestamp: %3$tT"</string>
-    <string name="location_failed">Location is not available</string>
+    <string name="location_text">Latitude: %1$.4f Longitude: %2$.4f Timestamp: %3$tT</string>
     <string name="sended_from">Sended from KeiTracker</string>
     <string name="share_with">Share with</string>
     <string name="track_option_share">Share</string>
@@ -10,9 +9,9 @@
     <string name="track_dialog_delete">Delete this track?</string>
     <string name="track_dialog_edit">Edit track</string>
     <string name="track_dialog_new">New track</string>
-    <string name="unnamed_track">Unnamed track</string>
+    <string name="unnamed_track" translatable="false">Unnamed track</string>
     <string name="start_recording_new_track">Start recording a new track</string>
-    <string name="ok">OK</string>
+    <string name="ok" translatable="false">OK</string>
     <string name="cancel">Cancel</string>
     <string name="name">Name</string>
     <string name="enable_gps">You should enable GPS</string>
@@ -25,4 +24,14 @@
     <string name="anonymous_tracking_title">Anonymous tracking</string>
     <string name="anonymous_tracking_summary">Show anonymous tracking data on global map</string>
     <string name="location_retrieving_interval_title">Location retrieving interval</string>
+    <string name="ten_seconds">10 seconds</string>
+    <string name="thirty_seconds">30 seconds</string>
+    <string name="one_minute">1 minute</string>
+    <string name="five_minutes">5 minutes</string>
+    <string name="ten_minutes">10 minutes</string>
+    <string name="started">started</string>
+    <string name="stopped">stopped</string>
+    <string name="latitude">latitude</string>
+    <string name="longitude">longitude</string>
+    <string name="altitude">altitude</string>
 </resources>

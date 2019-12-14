@@ -1,5 +1,6 @@
 package ru.riselab.keitracker.adapters;
 
+
 import android.content.Context;
 import android.content.Intent;
 import android.text.Html;
@@ -72,11 +73,11 @@ public class TrackListAdapter extends RecyclerView.Adapter<TrackListAdapter.Trac
             TrackModel current = mTracks.get(position);
             DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.getDefault());
 
-            String trackInfoString = String.format("<i>started: <b>%s</b>",
-                    dateFormat.format(new Date(current.getStartedAt())));
+            String trackInfoString = String.format("<i>%s: <b>%s</b>",
+                    holder.context.getString(R.string.started), dateFormat.format(new Date(current.getStartedAt())));
             if (current.getStoppedAt() != null) {
-                trackInfoString += String.format(", <i>stopped: <b>%s</b>",
-                        dateFormat.format(new Date(current.getStoppedAt())));
+                trackInfoString += String.format(", <i>%s: <b>%s</b>",
+                        holder.context.getString(R.string.started), dateFormat.format(new Date(current.getStoppedAt())));
             }
 
             holder.trackItemNameView.setText(String.format("%s) %s", position + 1, current.getName()));

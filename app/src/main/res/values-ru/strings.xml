@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">KeiTracker</string>
+    <string name="anonymous_tracking_summary">Анонимная информация о перемещении на общей карте</string>
+    <string name="anonymous_tracking_title">Анонимное отслеживание</string>
+    <string name="cancel">Отмена</string>
+    <string name="enable_gps">Вы должны включить GPS</string>
+    <string name="location_retrieving_interval_title">Интервал получения местоположения</string>
+    <string name="location_text">Широта: %1$.4f Долгота: %2$.4f Время: %3$tT</string>
+    <string name="name">Имя</string>
+    <string name="sended_from">Отправлено из приложения KeiTracker</string>
+    <string name="settings">Настройки</string>
+    <string name="share_with">Поделиться с помощью</string>
+    <string name="sign_in">Вход</string>
+    <string name="sign_in_for_enable">Опция недоступна, авторизуйтесь</string>
+    <string name="sign_in_success_message">Вы успешно авторизовались</string>
+    <string name="sign_out">Выход</string>
+    <string name="sign_out_success_message">Вы успешно вышли из аккаунта</string>
+    <string name="start_recording_new_track">Начата запись нового трека</string>
+    <string name="track_dialog_delete">Удалить этот трек?</string>
+    <string name="track_dialog_edit">Редактирование трека</string>
+    <string name="track_dialog_new">Новый трек</string>
+    <string name="track_option_delete">Удалить</string>
+    <string name="track_option_edit">Изменить</string>
+    <string name="track_option_share">Поделиться</string>
+    <string name="five_minutes">5 минут</string>
+    <string name="one_minute">1 минута</string>
+    <string name="ten_minutes">10 минут</string>
+    <string name="ten_seconds">10 секунд</string>
+    <string name="thirty_seconds">30 секунд</string>
+    <string name="started">запущен</string>
+    <string name="stopped">остановлен</string>
+    <string name="latitude">широта</string>
+    <string name="longitude">долгота</string>
+    <string name="altitude">высота</string>
+</resources>
