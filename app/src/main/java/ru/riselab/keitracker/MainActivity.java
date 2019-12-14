@@ -25,7 +25,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.facebook.stetho.Stetho;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -74,9 +73,6 @@ public class MainActivity extends AppCompatActivity {
             adapter.setTracks(tracks);
             mProgressBar.setVisibility(View.GONE);
         });
-
-        // TODO: remove on release
-        Stetho.initializeWithDefaults(getApplicationContext());
     }
 
     @Override

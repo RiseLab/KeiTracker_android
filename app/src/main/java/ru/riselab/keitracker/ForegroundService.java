@@ -26,6 +26,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Date;
+import java.util.Random;
 
 import ru.riselab.keitracker.db.model.PointModel;
 import ru.riselab.keitracker.db.model.TrackModel;
@@ -37,7 +38,10 @@ public class ForegroundService extends Service {
     public static final int SERVICE_ID = 1;
     public static final String CHANNEL_ID = "ForegroundServiceChannel";
 
-    private static final String CHECKPOINTS_REF = "checkpoints";
+    private static final String USERS_PUBLIC_REF = "users/public";
+    private static final String USERS_PRIVATE_REF = "users/private";
+
+    private int mPrefLocationRetrievingInterval;
 
     private TrackRepository mTrackRepository;
     private PointRepository mPointRepository;
@@ -55,12 +59,15 @@ public class ForegroundService extends Service {
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
+        // Get application settings
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        mPrefLocationRetrievingInterval = Integer.parseInt(sharedPreferences.getString(
+                SettingsActivity.KEY_PREF_LOCATION_RETRIEVING_INTERVAL, "10000"));
         boolean prefAnonymousTracking = sharedPreferences.getBoolean(
                 SettingsActivity.KEY_PREF_ANONYMOUS_TRACKING, false);
 
         FirebaseDatabase firebaseDb = FirebaseDatabase.getInstance();
-        DatabaseReference firebaseDbRef = firebaseDb.getReference(CHECKPOINTS_REF);
+        DatabaseReference firebaseDbRef = firebaseDb.getReference(USERS_PUBLIC_REF);
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
         mLocationCallback = new LocationCallback() {
@@ -81,6 +88,7 @@ public class ForegroundService extends Service {
                 // Save location data to Firebase DB
                 if (firebaseUser != null && prefAnonymousTracking){
                     firebaseDbRef.child(firebaseUser.getUid())
+                            .child("checkpoints")
                             .push()
                             .setValue(pointModel);
                 }
@@ -164,7 +172,7 @@ public class ForegroundService extends Service {
 
     private LocationRequest getLocationRequest() {
         LocationRequest locationRequest = new LocationRequest();
-        locationRequest.setInterval(10000);
+        locationRequest.setInterval(mPrefLocationRetrievingInterval);
         locationRequest.setFastestInterval(5000);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         return locationRequest;
