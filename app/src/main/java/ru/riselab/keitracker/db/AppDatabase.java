@@ -9,13 +9,16 @@ import androidx.room.RoomDatabase;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import ru.riselab.keitracker.db.dao.LocationDao;
-import ru.riselab.keitracker.db.model.LocationModel;
+import ru.riselab.keitracker.db.dao.PointDao;
+import ru.riselab.keitracker.db.dao.TrackDao;
+import ru.riselab.keitracker.db.model.PointModel;
+import ru.riselab.keitracker.db.model.TrackModel;
 
-@Database(entities = {LocationModel.class}, version = 1, exportSchema = false)
+@Database(entities = {TrackModel.class, PointModel.class}, version = 1, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
-    public abstract LocationDao locationDao();
+    public abstract TrackDao trackDao();
+    public abstract PointDao pointDao();
 
     private static volatile AppDatabase INSTANCE;
     private static final int NUMBER_OF_THREADS = 4;

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -16,8 +17,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 import ru.riselab.keitracker.adapters.PointListAdapter;
-import ru.riselab.keitracker.db.model.LocationModel;
-import ru.riselab.keitracker.db.viewmodel.LocationViewModel;
+import ru.riselab.keitracker.db.model.PointModel;
+import ru.riselab.keitracker.db.viewmodel.PointViewModel;
 
 
 /**
@@ -25,6 +26,7 @@ import ru.riselab.keitracker.db.viewmodel.LocationViewModel;
  */
 public class TrackPointsTabFragment extends Fragment {
 
+    private ProgressBar mProgressBar;
 
     public TrackPointsTabFragment() {
         // Required empty public constructor
@@ -37,21 +39,25 @@ public class TrackPointsTabFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_track_points_tab, container, false);
 
+        mProgressBar = rootView.findViewById(R.id.progressBar);
+        mProgressBar.setVisibility(View.VISIBLE);
+
         RecyclerView recyclerView = rootView.findViewById(R.id.trackLocationList);
         final PointListAdapter adapter = new PointListAdapter(this.getContext());
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
 
-        LocationViewModel locationViewModel = new ViewModelProvider(this).get(LocationViewModel.class);
+        PointViewModel pointViewModel = new ViewModelProvider(this).get(PointViewModel.class);
 
         TrackActivity trackActivity = (TrackActivity) getActivity();
-        String trackUuid = (trackActivity != null) ? trackActivity.getTrackUuid() : "";
+        Integer trackId = (trackActivity != null) ? trackActivity.getTrackId() : null;
 
-        locationViewModel.getTrackLocations(trackUuid).observe(
-                this.getViewLifecycleOwner(), new Observer<List<LocationModel>>() {
+        pointViewModel.getTrackPoints(trackId).observe(
+                this.getViewLifecycleOwner(), new Observer<List<PointModel>>() {
                     @Override
-                    public void onChanged(@Nullable List<LocationModel> points) {
+                    public void onChanged(@Nullable List<PointModel> points) {
                         adapter.setPoints(points);
+                        mProgressBar.setVisibility(View.GONE);
                     }
                 }
         );

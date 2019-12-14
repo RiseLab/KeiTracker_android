@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <ListPreference
+        android:defaultValue="10000"
+        android:entries="@array/pref_location_retrieving_interval_titles"
+        android:entryValues="@array/pref_location_retrieving_interval_values"
+        app:useSimpleSummaryProvider="true"
+        android:key="pref_location_retrieving_interval"
+        android:title="@string/location_retrieving_interval_title"
+        app:iconSpaceReserved="false" />
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="pref_anonymous_tracking"
+        android:summary="@string/anonymous_tracking_summary"
+        android:title="@string/anonymous_tracking_title"
+        app:iconSpaceReserved="false" />
+
+</PreferenceScreen>

@@ -6,35 +6,46 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Build;
 import android.os.IBinder;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
-import androidx.lifecycle.ViewModelProvider;
+import androidx.preference.PreferenceManager;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Date;
-import java.util.UUID;
+import java.util.Random;
 
-import ru.riselab.keitracker.db.model.LocationModel;
-import ru.riselab.keitracker.db.repository.LocationRepository;
-import ru.riselab.keitracker.db.viewmodel.LocationViewModel;
+import ru.riselab.keitracker.db.model.PointModel;
+import ru.riselab.keitracker.db.model.TrackModel;
+import ru.riselab.keitracker.db.repository.PointRepository;
+import ru.riselab.keitracker.db.repository.TrackRepository;
 
 public class ForegroundService extends Service {
 
     public static final int SERVICE_ID = 1;
     public static final String CHANNEL_ID = "ForegroundServiceChannel";
 
-    private String mTrackUuid;
+    private static final String USERS_PUBLIC_REF = "users/public";
+    private static final String USERS_PRIVATE_REF = "users/private";
 
-    private LocationRepository mLocationRepository;
+    private int mPrefLocationRetrievingInterval;
+
+    private TrackRepository mTrackRepository;
+    private PointRepository mPointRepository;
+
     private Location mLastLocation;
     private LocationCallback mLocationCallback;
     private FusedLocationProviderClient mFusedLocationClient;
@@ -43,11 +54,21 @@ public class ForegroundService extends Service {
     public void onCreate() {
         super.onCreate();
 
-        mTrackUuid = UUID.randomUUID().toString();
-
-        mLocationRepository = new LocationRepository(getApplication());
+        mTrackRepository = new TrackRepository(getApplication());
+        mPointRepository = new PointRepository(getApplication());
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        // Get application settings
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        mPrefLocationRetrievingInterval = Integer.parseInt(sharedPreferences.getString(
+                SettingsActivity.KEY_PREF_LOCATION_RETRIEVING_INTERVAL, "10000"));
+        boolean prefAnonymousTracking = sharedPreferences.getBoolean(
+                SettingsActivity.KEY_PREF_ANONYMOUS_TRACKING, false);
+
+        FirebaseDatabase firebaseDb = FirebaseDatabase.getInstance();
+        DatabaseReference firebaseDbRef = firebaseDb.getReference(USERS_PUBLIC_REF);
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
         mLocationCallback = new LocationCallback() {
             @Override
@@ -56,13 +77,23 @@ public class ForegroundService extends Service {
 
                 mLastLocation = locationResult.getLastLocation();
 
-                LocationModel locationModel = new LocationModel(mTrackUuid,
+                // Save location data to Room DB
+                PointModel pointModel = new PointModel(mTrackRepository.getLastInsertedId(),
                         mLastLocation.getLatitude(),
                         mLastLocation.getLongitude(),
                         mLastLocation.getAltitude(),
-                        new Date());
-                mLocationRepository.insert(locationModel);
+                        mLastLocation.getTime());
+                mPointRepository.insert(pointModel);
 
+                // Save location data to Firebase DB
+                if (firebaseUser != null && prefAnonymousTracking){
+                    firebaseDbRef.child(firebaseUser.getUid())
+                            .child("checkpoints")
+                            .push()
+                            .setValue(pointModel);
+                }
+
+                // Show location data in notification
                 String locationText = getString(R.string.location_text,
                         mLastLocation.getLatitude(),
                         mLastLocation.getLongitude(),
@@ -74,15 +105,19 @@ public class ForegroundService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        String input = intent.getStringExtra("inputExtra");
+        String trackName = intent.getStringExtra(MainActivity.EXTRA_TRACK_NAME);
         createNotificationChannel();
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this,
                 0, notificationIntent, 0);
 
+        Date date = new Date();
+        TrackModel trackModel = new TrackModel(trackName, date.getTime(), null);
+        mTrackRepository.insert(trackModel);
+
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle(getString(R.string.app_name))
-                .setContentText(input)
+                .setContentText(String.format("%s: %s", getString(R.string.start_recording_new_track), trackName))
                 .setSmallIcon(R.drawable.ic_directions_walk_black_24dp)
                 .setContentIntent(pendingIntent)
                 .build();
@@ -137,7 +172,7 @@ public class ForegroundService extends Service {
 
     private LocationRequest getLocationRequest() {
         LocationRequest locationRequest = new LocationRequest();
-        locationRequest.setInterval(10000);
+        locationRequest.setInterval(mPrefLocationRetrievingInterval);
         locationRequest.setFastestInterval(5000);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         return locationRequest;

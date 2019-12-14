@@ -1,17 +1,14 @@
 package ru.riselab.keitracker;
 
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.annotation.NonNull;
 import androidx.core.content.FileProvider;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
@@ -33,8 +30,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-import ru.riselab.keitracker.db.model.LocationModel;
-import ru.riselab.keitracker.db.viewmodel.LocationViewModel;
+import ru.riselab.keitracker.db.model.PointModel;
+import ru.riselab.keitracker.db.viewmodel.PointViewModel;
 
 
 /**
@@ -54,13 +51,13 @@ public class TrackMapTabFragment extends Fragment implements OnMapReadyCallback,
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_track_map_tab, container, false);
 
-        LocationViewModel locationViewModel = new ViewModelProvider(this).get(LocationViewModel.class);
+        PointViewModel pointViewModel = new ViewModelProvider(this).get(PointViewModel.class);
 
         TrackActivity trackActivity = (TrackActivity) getActivity();
-        String trackUuid = (trackActivity != null) ? trackActivity.getTrackUuid() : "";
+        Integer trackId = (trackActivity != null) ? trackActivity.getTrackId() : null;
 
         // TODO: create repository for map if possible
-        locationViewModel.getTrackLocations(trackUuid).observe(
+        pointViewModel.getTrackPoints(trackId).observe(
                 this.getViewLifecycleOwner(), points -> {
                     if (points.size() != 0 && mMap != null) {
                         LatLngBounds.Builder builder = new LatLngBounds.Builder();
@@ -69,7 +66,7 @@ public class TrackMapTabFragment extends Fragment implements OnMapReadyCallback,
 
                         mMap.clear();
 
-                        for (LocationModel point : points) {
+                        for (PointModel point : points) {
                             LatLng latLng = new LatLng(
                                     point.getLatitude(),
                                     point.getLongitude()
@@ -77,17 +74,17 @@ public class TrackMapTabFragment extends Fragment implements OnMapReadyCallback,
 
                             CircleOptions circleOptions = new CircleOptions()
                                     .center(latLng)
-                                    .radius(3)
+                                    .radius(0.5)
                                     .strokeWidth(10)
-                                    .strokeColor(ResourcesCompat.getColor(getResources(), R.color.colorAccent, null))
-                                    .fillColor(ResourcesCompat.getColor(getResources(), R.color.colorPrimaryDark, null))
+                                    .strokeColor(ResourcesCompat.getColor(getResources(), R.color.colorPrimaryDark2, null))
+                                    .fillColor(ResourcesCompat.getColor(getResources(), R.color.colorAccent2, null))
                                     .zIndex(11);
                             mMap.addCircle(circleOptions);
 
                             builder.include(latLng);
 
                             polylineOptions.add(latLng)
-                                    .color(ResourcesCompat.getColor(getResources(), R.color.colorAccent, null))
+                                    .color(ResourcesCompat.getColor(getResources(), R.color.colorAccent2, null))
                                     .width(10)
                                     .zIndex(10);
                         }

@@ -6,21 +6,16 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 
-import ru.riselab.keitracker.utils.DateConverter;
-
-import java.util.Date;
-
-@Entity(tableName = "location")
-@TypeConverters({DateConverter.class})
-public class LocationModel {
+@Entity(tableName = "point")
+public class PointModel {
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
     private Integer mId;
 
     @NonNull
-    @ColumnInfo(name = "track_uuid")
-    private String mTrackUuid;
+    @ColumnInfo(name = "track_id")
+    private Integer mTrackId;
 
     @NonNull
     @ColumnInfo(name = "latitude")
@@ -36,14 +31,14 @@ public class LocationModel {
 
     @NonNull
     @ColumnInfo(name = "fixed_at")
-    private Date mFixedAt;
+    private Long mFixedAt;
 
-    public LocationModel(@NonNull String trackUuid,
-                         @NonNull Double latitude,
-                         @NonNull Double longitude,
-                         @NonNull Double altitude,
-                         @NonNull Date fixedAt) {
-        mTrackUuid = trackUuid;
+    public PointModel(@NonNull Integer trackId,
+                      @NonNull Double latitude,
+                      @NonNull Double longitude,
+                      @NonNull Double altitude,
+                      @NonNull Long fixedAt) {
+        mTrackId = trackId;
         mLatitude = latitude;
         mLongitude = longitude;
         mAltitude = altitude;
@@ -59,12 +54,12 @@ public class LocationModel {
     }
 
     @NonNull
-    public String getTrackUuid() {
-        return mTrackUuid;
+    public Integer getTrackId() {
+        return mTrackId;
     }
 
-    public void setTrackUuid(@NonNull String trackUuid) {
-        mTrackUuid = trackUuid;
+    public void setTrackId(@NonNull Integer trackId) {
+        mTrackId = trackId;
     }
 
     @NonNull
@@ -95,12 +90,11 @@ public class LocationModel {
     }
 
     @NonNull
-    public Date getFixedAt() {
+    public Long getFixedAt() {
         return mFixedAt;
     }
 
-    public void setFixedAt(@NonNull Date fixedAt) {
+    public void setFixedAt(@NonNull Long fixedAt) {
         mFixedAt = fixedAt;
     }
 }
-
