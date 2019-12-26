@@ -33,4 +33,8 @@
     <string name="latitude">широта</string>
     <string name="longitude">долгота</string>
     <string name="altitude">высота</string>
+    <string name="about">О приложении</string>
+    <string name="about_text">Приложение позволяет записывать маршруты перемещения и делиться ими.</string>
+    <string name="privacy_policy"><a href="https://keitracker.riselab.ru/privacy-policy">Политика конфиденциальности</a></string>
+    <string name="terms_and_conditions"><a href="https://keitracker.riselab.ru/terms-and-conditions">Условия и положения</a></string>
 </resources>

@@ -18,6 +18,7 @@
     <string name="settings">Settings</string>
     <string name="sign_in">Sign in</string>
     <string name="sign_out">Sign out</string>
+    <string name="about">About</string>
     <string name="sign_in_for_enable">Sign in for enable this option</string>
     <string name="sign_in_success_message">You successfully signed in</string>
     <string name="sign_out_success_message">You successfully signed out</string>
@@ -34,4 +35,7 @@
     <string name="latitude">latitude</string>
     <string name="longitude">longitude</string>
     <string name="altitude">altitude</string>
+    <string name="about_text">The application allows you to record GPS tracks and share them with other users.</string>
+    <string name="privacy_policy"><a href="https://keitracker.riselab.ru/privacy-policy">Privacy Policy</a></string>
+    <string name="terms_and_conditions"><a href="https://keitracker.riselab.ru/terms-and-conditions">Terms and Conditions</a></string>
 </resources>
