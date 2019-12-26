@@ -54,9 +54,12 @@ public class PointListAdapter extends RecyclerView.Adapter<PointListAdapter.Poin
             DateFormat dateFormat = new SimpleDateFormat(
                     "dd.MM.yyyy HH:mm:ss", Locale.getDefault());
             String pointTextString = String.format(
-                    "<i>latitude: <b>%s</b>, longitude: <b>%s</b>, altitude: <b>%s</b></i>",
+                    "<i>%s: <b>%s</b>, %s: <b>%s</b>, %s: <b>%s</b></i>",
+                    holder.itemView.getContext().getString(R.string.latitude),
                     current.getLatitude(),
+                    holder.itemView.getContext().getString(R.string.longitude),
                     current.getLongitude(),
+                    holder.itemView.getContext().getString(R.string.altitude),
                     current.getAltitude());
             holder.pointItemTitleView.setText(
                     String.format("%s) %s", position + 1, dateFormat.format(current.getFixedAt())));

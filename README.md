@@ -14,7 +14,8 @@ Android tracking application
 - [x] Add settings page
 - [x] Add "Share" function
 - [x] Implement Google Maps and draw tracks
-- [ ] Add language support
+- [ ] Improve location accuracy, prevent location jitter
+- [x] Add language support
 - [ ] Improve UI (navigation, color scheme, etc.)
 - [ ] Add app link (remove warning from manifest)
 - [x] Implement Firebase for communication

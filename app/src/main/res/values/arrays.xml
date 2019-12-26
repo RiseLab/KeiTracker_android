@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="pref_location_retrieving_interval_titles">
-        <item>10 seconds</item>
-        <item>30 seconds</item>
-        <item>1 minute</item>
-        <item>5 minutes</item>
-        <item>10 minutes</item>
+        <item>@string/ten_seconds</item>
+        <item>@string/thirty_seconds</item>
+        <item>@string/one_minute</item>
+        <item>@string/five_minutes</item>
+        <item>@string/ten_minutes</item>
     </string-array>
     <string-array name="pref_location_retrieving_interval_values">
         <item>10000</item>
