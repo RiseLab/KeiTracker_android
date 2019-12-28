@@ -26,7 +26,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Date;
-import java.util.Random;
 
 import ru.riselab.keitracker.db.model.PointModel;
 import ru.riselab.keitracker.db.model.TrackModel;
@@ -39,7 +38,7 @@ public class ForegroundService extends Service {
     public static final String CHANNEL_ID = "ForegroundServiceChannel";
 
     private static final String USERS_PUBLIC_REF = "users/public";
-    private static final String USERS_PRIVATE_REF = "users/private";
+    //private static final String USERS_PRIVATE_REF = "users/private";
 
     private int mPrefLocationRetrievingInterval;
 
@@ -77,6 +76,10 @@ public class ForegroundService extends Service {
 
                 mLastLocation = locationResult.getLastLocation();
 
+                if (mLastLocation.getAccuracy() > 10) {
+                    return;
+                }
+
                 // Save location data to Room DB
                 PointModel pointModel = new PointModel(mTrackRepository.getLastInsertedId(),
                         mLastLocation.getLatitude(),
@@ -107,24 +110,20 @@ public class ForegroundService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         String trackName = intent.getStringExtra(MainActivity.EXTRA_TRACK_NAME);
         createNotificationChannel();
-        Intent notificationIntent = new Intent(this, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this,
-                0, notificationIntent, 0);
+
+        if (trackName == null || trackName.isEmpty()) {
+            trackName = getString(R.string.unnamed_track);
+        }
 
         Date date = new Date();
         TrackModel trackModel = new TrackModel(trackName, date.getTime(), null);
         mTrackRepository.insert(trackModel);
 
-        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle(getString(R.string.app_name))
-                .setContentText(String.format("%s: %s", getString(R.string.start_recording_new_track), trackName))
-                .setSmallIcon(R.drawable.ic_directions_walk_black_24dp)
-                .setContentIntent(pendingIntent)
-                .build();
+        startForeground(SERVICE_ID, getNotification(
+                String.format("%s: %s", getString(R.string.start_recording_new_track), trackName)));
 
-        startForeground(SERVICE_ID, notification);
-
-        mFusedLocationClient.requestLocationUpdates(getLocationRequest(), mLocationCallback, null);
+        mFusedLocationClient.requestLocationUpdates(
+                getLocationRequest(), mLocationCallback, null);
 
         return START_NOT_STICKY;
     }
@@ -149,25 +148,17 @@ public class ForegroundService extends Service {
                     NotificationManager.IMPORTANCE_DEFAULT);
 
             NotificationManager manager = getSystemService(NotificationManager.class);
-            manager.createNotificationChannel(serviceChannel);
+            if (manager != null) {
+                manager.createNotificationChannel(serviceChannel);
+            }
         }
     }
 
     private void sendNotification(String text) {
-        Intent notificationIntent = new Intent(this, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this,
-                0, notificationIntent, 0);
-
-        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle(getString(R.string.app_name))
-                .setContentText(text)
-                .setSmallIcon(R.drawable.ic_directions_walk_black_24dp)
-                .setContentIntent(pendingIntent)
-                .setOnlyAlertOnce(true)
-                .build();
-
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        manager.notify(SERVICE_ID, notification);
+        if (manager != null) {
+            manager.notify(SERVICE_ID, getNotification(text));
+        }
     }
 
     private LocationRequest getLocationRequest() {
@@ -176,5 +167,31 @@ public class ForegroundService extends Service {
         locationRequest.setFastestInterval(5000);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         return locationRequest;
+    }
+
+    private Notification getNotification(String text) {
+        Intent openIntent = new Intent(this, MainActivity.class);
+        PendingIntent openPendingIntent = PendingIntent.getActivity(this,
+                0, openIntent, 0);
+
+        Intent stopIntent = new Intent(this, MainActivity.class);
+        stopIntent.putExtra(MainActivity.EXTRA_NOTIFICATION_ACTION, MainActivity.CMD_STOP);
+        PendingIntent stopPendingIntent = PendingIntent.getActivity(this,
+                1, stopIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Intent showIntent = new Intent(this, TrackActivity.class);
+        showIntent.putExtra(MainActivity.EXTRA_TRACK_ID, mTrackRepository.getLastInsertedId());
+        PendingIntent showPendingIntent = PendingIntent.getActivity(this,
+                2, showIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        return new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setContentTitle(getString(R.string.app_name))
+                .setContentText(text)
+                .setSmallIcon(R.drawable.ic_directions_walk_black_24dp)
+                .setContentIntent(openPendingIntent)
+                .addAction(R.drawable.ic_stop_tracking, getString(R.string.stop), stopPendingIntent)
+                .addAction(R.drawable.ic_track_points, getString(R.string.open), showPendingIntent)
+                .setOnlyAlertOnce(true)
+                .build();
     }
 }

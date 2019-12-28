@@ -2,25 +2,41 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <group
+        android:id="@+id/main_options_primary">
 
-    <item
-        android:id="@+id/main_option_sign_in"
-        android:title="@string/sign_in"
-        app:showAsAction="never" />
+        <item
+            android:id="@+id/main_option_sign_in"
+            android:title="@string/sign_in"
+            app:showAsAction="never" />
+        <item
+            android:id="@+id/main_option_sign_out"
+            android:title="@string/sign_out"
+            android:visible="false"
+            app:showAsAction="never" />
+        <item
+            android:id="@+id/main_option_settings"
+            android:title="@string/settings"
+            app:showAsAction="never" />
+        <item
+            android:id="@+id/main_option_about"
+            android:title="@string/about"
+            app:showAsAction="never" />
+    </group>
 
-    <item
-        android:id="@+id/main_option_sign_out"
-        android:title="@string/sign_out"
-        android:visible="false"
-        app:showAsAction="never" />
+    <group
+        android:id="@+id/main_options_edit"
+        android:visible="false">
 
-    <item
-        android:id="@+id/main_option_settings"
-        android:title="@string/settings"
-        app:showAsAction="never" />
+        <item
+            android:id="@+id/main_option_selected"
+            android:title="@string/items_selected"
+            app:showAsAction="always" />
+        <item
+            android:id="@+id/main_option_delete"
+            android:icon="@drawable/ic_action_delete"
+            android:title="@string/delete"
+            app:showAsAction="ifRoom" />
+    </group>
 
-    <item
-        android:id="@+id/main_option_about"
-        android:title="@string/about"
-        app:showAsAction="never" />
 </menu>

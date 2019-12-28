@@ -35,12 +35,17 @@ import java.util.Collections;
 import java.util.List;
 
 import ru.riselab.keitracker.adapters.TrackListAdapter;
+import ru.riselab.keitracker.db.repository.PointRepository;
+import ru.riselab.keitracker.db.repository.TrackRepository;
 import ru.riselab.keitracker.db.viewmodel.TrackViewModel;
 
 public class MainActivity extends AppCompatActivity {
 
     public static final String EXTRA_TRACK_ID = "ru.riselab.keitracker.extra.TRACK_ID";
     public static final String EXTRA_TRACK_NAME = "ru.riselab.keitracker.extra.TRACK_NAME";
+    public static final String EXTRA_NOTIFICATION_ACTION = "ru.riselab.keitracker.extra.NOTIFICATION_ACTION";
+
+    public static final int CMD_STOP = 1;
 
     private static final int RC_SIGN_IN = 11;
 
@@ -50,6 +55,8 @@ public class MainActivity extends AppCompatActivity {
 
     private ProgressBar mProgressBar;
     private FloatingActionButton mFab;
+
+    private TrackListAdapter mTrackListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,15 +69,20 @@ public class MainActivity extends AppCompatActivity {
         mFab = findViewById(R.id.fab);
         mFab.setImageResource(isLocationServiceRunning() ? R.drawable.ic_stop_tracking : R.drawable.ic_start_tracking);
 
+        int notificationAction = getIntent().getIntExtra(EXTRA_NOTIFICATION_ACTION, 0);
+        if (notificationAction == CMD_STOP) {
+            stopTrackingLocation();
+        }
+
         RecyclerView recyclerView = findViewById(R.id.mainTrackList);
-        final TrackListAdapter adapter = new TrackListAdapter(this);
-        recyclerView.setAdapter(adapter);
+        mTrackListAdapter = new TrackListAdapter(this);
+        recyclerView.setAdapter(mTrackListAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         TrackViewModel trackViewModel = new ViewModelProvider(this).get(TrackViewModel.class);
 
         trackViewModel.getAllTracks().observe(this, tracks -> {
-            adapter.setTracks(tracks);
+            mTrackListAdapter.setTracks(tracks);
             mProgressBar.setVisibility(View.GONE);
         });
     }
@@ -98,11 +110,10 @@ public class MainActivity extends AppCompatActivity {
             IdpResponse response = IdpResponse.fromResultIntent(data);
 
             if (resultCode == RESULT_OK) {
-                toggleMenuSignOptions(true);
+                toggleMenuSignOptions();
                 Toast.makeText(
                         this, R.string.sign_in_success_message,
                         Toast.LENGTH_LONG).show();
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             }
         }
     }
@@ -110,9 +121,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         mMenu = menu;
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         getMenuInflater().inflate(R.menu.main_options, menu);
-        toggleMenuSignOptions(user != null);
+        toggleMenuSignOptions();
         return true;
     }
 
@@ -134,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
                 AuthUI.getInstance()
                         .signOut(this)
                         .addOnCompleteListener(task -> {
-                            toggleMenuSignOptions(false);
+                            toggleMenuSignOptions();
                             Toast.makeText(this, R.string.sign_out_success_message,
                                     Toast.LENGTH_LONG).show();
                         });
@@ -146,6 +156,23 @@ public class MainActivity extends AppCompatActivity {
             case R.id.main_option_about:
                 Intent aboutIntent = new Intent(this, AboutActivity.class);
                 startActivity(aboutIntent);
+                return true;
+            case R.id.main_option_delete:
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle(getString((R.string.delete_selected_tracks)))
+                        .setPositiveButton(R.string.ok, (dialog, which) -> {
+                            TrackRepository trackRepository = new TrackRepository(getApplication());
+                            PointRepository pointRepository = new PointRepository(getApplication());
+
+                            List<Integer> selectedTracks = mTrackListAdapter.getSelectedTracks();
+
+                            pointRepository.deleteTrackPoints(selectedTracks);
+                            trackRepository.delete(selectedTracks);
+
+                            toggleMenuEditMode(false);
+                        })
+                        .setNegativeButton(R.string.cancel, null)
+                        .show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -187,9 +214,6 @@ public class MainActivity extends AppCompatActivity {
                     .setTitle(getString((R.string.track_dialog_new)))
                     .setPositiveButton(R.string.ok, (dialog, which) -> {
                         String trackName = trackNameView.getText().toString();
-                        if (trackName.length() == 0) {
-                            trackName = getString(R.string.unnamed_track);
-                        }
                         startForegroundService(trackName);
                         mFab.setImageResource(R.drawable.ic_stop_tracking);
                     })
@@ -248,8 +272,26 @@ public class MainActivity extends AppCompatActivity {
                 .show();
     }
 
-    private void toggleMenuSignOptions(boolean isSignedIn) {
-        mMenu.findItem(R.id.main_option_sign_in).setVisible(!isSignedIn);
-        mMenu.findItem(R.id.main_option_sign_out).setVisible(isSignedIn);
+    private void toggleMenuSignOptions() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        mMenu.findItem(R.id.main_option_sign_in).setVisible(user == null);
+        mMenu.findItem(R.id.main_option_sign_out).setVisible(user != null);
+    }
+
+    public void toggleMenuEditMode(boolean isEditMode) {
+        mMenu.setGroupVisible(R.id.main_options_primary, !isEditMode);
+        mMenu.setGroupVisible(R.id.main_options_edit, isEditMode);
+
+        if (!isEditMode) {
+            mFab.show();
+            toggleMenuSignOptions();
+        } else {
+            mFab.hide();
+        }
+    }
+
+    public void setItemsSelectedText(Integer first, Integer second) {
+        mMenu.findItem(R.id.main_option_selected)
+                .setTitle(String.format(getString(R.string.items_selected), first, second));
     }
 }

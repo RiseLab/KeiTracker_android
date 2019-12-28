@@ -19,6 +19,9 @@ public interface TrackDao {
     @Query("DELETE FROM track WHERE id = :id")
     void delete(Integer id);
 
+    @Query("DELETE FROM track WHERE id in (:idList)")
+    void delete(List<Integer> idList);
+
     @Update
     void update(TrackModel track);
 

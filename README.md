@@ -19,6 +19,7 @@ Android tracking application
 - [ ] Improve UI (navigation, color scheme, etc.)
 - [ ] Add app link (remove warning from manifest)
 - [x] Implement Firebase for communication
+- [ ] Export and import tracks feature
 - [ ] Add collective tracking function
 - [x] Simple website for realtime anonymous tracking
 - [ ] Google PlayMarket

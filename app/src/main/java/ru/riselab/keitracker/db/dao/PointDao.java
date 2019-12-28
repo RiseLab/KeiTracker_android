@@ -18,6 +18,9 @@ public interface PointDao {
     @Query("DELETE FROM point WHERE track_id = :trackId")
     void deleteTrackPoints(Integer trackId);
 
+    @Query("DELETE FROM point WHERE track_id in (:trackIdList)")
+    void deleteTrackPoints(List<Integer> trackIdList);
+
     @Query("SELECT * FROM point WHERE track_id = :trackId")
     LiveData<List<PointModel>> getTrackPoints(Integer trackId);
 }

@@ -43,6 +43,12 @@ public class TrackRepository {
         });
     }
 
+    public void delete(final List<Integer> trackIdList) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            mTrackDao.delete(trackIdList);
+        });
+    }
+
     public void update(final TrackModel track) {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             mTrackDao.update(track);

@@ -35,4 +35,10 @@ public class PointRepository {
             mPointDao.deleteTrackPoints(trackId);
         });
     }
+
+    public void deleteTrackPoints(final List<Integer> trackIdList) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            mPointDao.deleteTrackPoints(trackIdList);
+        });
+    }
 }

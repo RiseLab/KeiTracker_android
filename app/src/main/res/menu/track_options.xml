@@ -12,12 +12,6 @@
         android:id="@+id/track_option_edit"
         android:icon="@drawable/ic_action_edit"
         android:title="@string/track_option_edit"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/track_option_delete"
-        android:icon="@drawable/ic_action_delete"
-        android:title="@string/track_option_delete"
-        app:showAsAction="never" />
+        app:showAsAction="ifRoom" />
 
 </menu>

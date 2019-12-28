@@ -13,6 +13,8 @@ public class AboutActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
 
+        setTitle(R.string.about);
+
         TextView privacyPolicyLink = (TextView) findViewById(R.id.aboutPrivacyPolicy);
         privacyPolicyLink.setMovementMethod(LinkMovementMethod.getInstance());
 

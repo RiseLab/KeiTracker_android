@@ -17,10 +17,8 @@
     <string name="sign_out">Выход</string>
     <string name="sign_out_success_message">Вы успешно вышли из аккаунта</string>
     <string name="start_recording_new_track">Начата запись нового трека</string>
-    <string name="track_dialog_delete">Удалить этот трек?</string>
     <string name="track_dialog_edit">Редактирование трека</string>
     <string name="track_dialog_new">Новый трек</string>
-    <string name="track_option_delete">Удалить</string>
     <string name="track_option_edit">Изменить</string>
     <string name="track_option_share">Поделиться</string>
     <string name="five_minutes">5 минут</string>
@@ -37,4 +35,9 @@
     <string name="about_text">Приложение позволяет записывать маршруты перемещения и делиться ими.</string>
     <string name="privacy_policy"><a href="https://keitracker.riselab.ru/privacy-policy">Политика конфиденциальности</a></string>
     <string name="terms_and_conditions"><a href="https://keitracker.riselab.ru/terms-and-conditions">Условия и положения</a></string>
+    <string name="stop">Остановить</string>
+    <string name="open">Открыть</string>
+    <string name="delete">Удалить</string>
+    <string name="delete_selected_tracks">Удалить выбранные треки?</string>
+    <string name="items_selected">%d из %d</string>
 </resources>
