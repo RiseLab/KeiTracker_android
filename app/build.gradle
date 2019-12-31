@@ -6,8 +6,8 @@ android {
         applicationId "ru.riselab.keitracker"
         minSdkVersion 19
         targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         resValue "string", "GOOGLE_MAPS_KEY_DEBUG", "$GOOGLE_MAPS_KEY_DEBUG"
         resValue "string", "GOOGLE_MAPS_KEY_RELEASE", "$GOOGLE_MAPS_KEY_RELEASE"
